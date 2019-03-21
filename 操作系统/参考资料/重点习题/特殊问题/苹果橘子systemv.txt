@@ -1,0 +1,244 @@
+//
+//  main.c
+//  test2
+//  利用SYSTEM V信号量函数模拟苹果橘子问题
+//  Created by 史 哲文 on 13-3-19.
+//  Copyright (c) 2013年 史 哲文. All rights reserved.
+//
+
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+#include<sys/ipc.h>
+#include<sys/sem.h>
+#include<stdlib.h>
+#include<math.h>
+#include<errno.h>
+
+union senum{
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+}arg;
+
+
+int main()
+{
+    int pid1,pid2,sg,sp1,sp2;
+    
+    if((sg=semget(IPC_PRIVATE,1,IPC_CREAT|00666))<0)//创建信号灯集，其中包含1个信号灯
+    {
+    printf("sg函数创建信号灯集出现错误。\n");
+    exit(2);
+          }
+    else
+        printf("sg函数创建信号灯集成功，信号灯集识别代号sg为：%d\n",sg);
+    
+    
+    if((sp1=semget(IPC_PRIVATE,1,IPC_CREAT|00666))<0)//创建信号灯集，其中包含1个信号灯
+    {
+        printf("sp1函数创建信号灯集出现错误。\n");
+        exit(2);
+
+    }
+    else
+        printf("sp1函数创建信号灯集成功，信号灯集识别代号sp1为：%d\n",sp1);
+    
+    
+    if((sp2=semget(IPC_PRIVATE,1,IPC_CREAT|00666))<0)//创建信号灯集，其中包含1个信号灯
+    {
+        printf("sp2函数创建信号灯集出现错误。\n");
+        exit(2);
+    
+    }
+    else
+        printf("sp2函数创建信号灯集成功，信号灯集识别代号sp2为：%d\n",sp2);
+    
+    arg.val=1;
+    if((semctl(sg,0,SETVAL,arg))<0)//此句与上句合起来的功能是将sg对应的信号集中的第一个信号（0表示第一个信号）的可用资源数量设置为1
+    {
+        printf("semctl函数设置第一个信号量sg初值时错误。\n");
+        exit(9);
+    }
+    else
+        printf("semctl函数设置第一个信号量sg初值成功。\n");
+    
+    arg.val=0;
+    if((semctl(sp1,0,SETVAL,arg))<0)//此句与上句合起来的功能是将sp1对应的信号集中的第1个信号的可用资源数量设置为0
+    {
+        printf("semctl函数设置第二个信号量sp1初值时错误。\n");
+        exit(9);
+    }
+    else
+        printf("semctl函数设置第二个信号量sp1初值成功。\n");
+    
+    arg.val=0;
+    if((semctl(sp2,0,SETVAL,arg))<0)//此句与上句合起来的功能是将sp2对应的信号集中的第1个信号的可用资源数量设置为0
+    {
+        printf("semctl函数设置第三个信号量sp2初值时错误。\n");
+        exit(9);
+    }
+    else
+        printf("semctl函数设置第三个信号量sp2初值成功。\n");
+    
+
+    
+    struct sembuf p_op_buf,v_op_buf;
+    p_op_buf.sem_num=0;
+    p_op_buf.sem_op=-1;
+    p_op_buf.sem_flg=0;
+    v_op_buf.sem_num=0;
+    v_op_buf.sem_op=1;
+ 
+
+    if(((pid1=fork())<0)||((pid2=fork())<0))
+    {
+        printf("fork函数创建子进程出现错误。\n");
+        exit(3);
+    }
+    else if(pid1>0 && pid2>0)//父进程，先索取共享资源，而后释放
+    {
+         
+        while(1){
+            int i;
+            printf("父亲进程ID为：%d，该进程将要削苹果\n",getpid());
+            for(i=5;i>0;i--)
+            {
+                printf("父亲进程（父进程）还要%d秒钟削完苹果……\n",i);
+                sleep(1);
+            }
+            printf("父亲进程将要索取盘子放苹果\n");
+
+            if(semop(sg,&p_op_buf,1)<0)//以上三行向semid代表的信号灯集的第一个信号灯申请一个资源
+            {
+                printf("父亲进程中，semop函数索取盘子资源出现错误。\n");
+                exit(4);
+            }
+            else
+            {
+                printf("父亲进程中，索取盘子资源成功，索取个数为：%d\n",abs(p_op_buf.sem_op));
+                sleep(1);
+                printf("父亲进程已经把苹果放入盘子，并将叫女儿拿苹果。\n");
+                if(semop(sp1,&v_op_buf,1)<0)//以上三行将释放一个资源给semid代表的信号灯集第一个信号灯
+                {
+                    printf("父进程中，semop函数告诉女儿苹果已经放入失败。\n");
+                    exit(5);
+                }
+                else
+                {
+                    printf("父进程中，成功告诉女儿苹果已经放了。\n");
+                    sleep(1);
+                }
+            }
+            
+        }
+    }
+    else if (pid1>0 && pid2==0)//母亲进程
+    {
+        while(1){
+            int i;
+            printf("母亲进程ID为：%d，该进程将要剥桔子\n",getpid());
+            for(i=6;i>0;i--)
+            {
+                printf("母亲进程（父进程）还要%d秒钟剥完橘子……\n",i);
+                sleep(1);
+            }
+            printf("母亲进程将要索取盘子放橘子\n");
+            
+            if(semop(sg,&p_op_buf,1)<0)//以上三行向semid代表的信号灯集的第一个信号灯申请一个资源
+            {
+                printf("母亲进程中，semop函数索取盘子资源出现错误。\n");
+                exit(4);
+            }
+            else
+            {
+                printf("母亲进程中，索取盘子资源成功，索取个数为：%d\n",abs(p_op_buf.sem_op));
+                sleep(1);
+                printf("母亲进程已经把橘子放入盘子，并将叫儿子拿橘子。\n");
+                if(semop(sp2,&v_op_buf,1)<0)//以上三行将释放一个资源给semid代表的信号灯集第一个信号灯
+                {
+                    printf("母亲进程中，semop函数告诉儿子橘子已经放入失败。\n");
+                    exit(5);
+                }
+                else
+                {
+                    printf("母亲进程中，成功告诉儿子橘子已经放了。\n");
+                    sleep(2);
+                }
+            }
+            
+        }
+        
+    }
+    else if (pid1==0 && pid2>0)   //儿子进程
+    {
+         
+        while(1){
+            int i;
+            printf("儿子进程ID为：%d，该进程将要拿桔子吃\n",getpid());
+            if(semop(sp2,&p_op_buf,1)<0)//以上三行向semid代表的信号灯集的第一个信号灯申请一个资源
+            {
+                printf("儿子进程中，semop函数看看盘子中是否有橘子出现错误。\n");
+                exit(4);
+            }
+            else
+            {
+                printf("儿子进程中，发现盘子中有橘子，索取盘子资源成功，索取个数为：%d\n",abs(p_op_buf.sem_op));
+                sleep(1);
+                if(semop(sg,&v_op_buf,1)<0)//以上三行将释放一个资源给semid代表的信号灯集第一个信号灯
+                {
+                    printf("儿子进程中，semop函数告诉父母盘子已经空了失败。\n");
+                    exit(5);
+                }
+                else
+                {
+                    printf("儿子进程已经把拿起橘子。\n");
+                    for(i=10;i>0;i--)
+                    {
+                        printf("儿子进程还要%d秒钟吃完橘子……\n",i);
+                        sleep(1);
+                    }
+
+                }
+            }
+            
+        }  
+        
+    }
+    else
+    {
+        
+        while(1){
+            int i;
+            printf("女儿进程ID为：%d，该进程将要拿苹果吃\n",getpid());
+            
+            if(semop(sp1,&p_op_buf,1)<0)//以上三行向semid代表的信号灯集的第一个信号灯申请一个资源
+            {
+                printf("女儿进程中，semop函数看看盘子中是否有苹果出现错误。\n");
+                exit(4);
+            }
+            else
+            {
+                printf("女儿进程中，发现盘子中有苹果，索取盘子资源成功，索取个数为：%d\n",abs(p_op_buf.sem_op));
+                sleep(1);
+                if(semop(sg,&v_op_buf,1)<0)//以上三行将释放一个资源给semid代表的信号灯集第一个信号灯
+                {
+                    printf("女儿进程中，semop函数告诉父母盘子已经空了失败。\n");
+                    exit(5);
+                }
+                else
+                {
+                    printf("女儿进程已经把苹果拿起。\n");
+                    for(i=9;i>0;i--)
+                    {
+                        printf("女儿进程还要%d秒钟吃完苹果……\n",i);
+                        sleep(1);
+                    }
+                    
+                }
+            }
+            
+        }
+        
+    }
+}
