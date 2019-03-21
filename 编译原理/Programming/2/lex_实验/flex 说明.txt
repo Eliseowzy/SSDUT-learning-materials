@@ -1,0 +1,51 @@
+flex 是- fast lexical analyzer generator 的简称。
+
+（一） 目录介绍
+
+在本实验目录中，包括两个子目录。
+
+1、子目录 flex 
+
+它包含了 flex.exe, flex.hlp, libfl.lib 三个文件，另外还有一个例子文件 example.l 及该例子生成的 lex.yy.c。
+
+2、子目录 lex_yy
+
+这个目录是为 lex.yy.c 建立的一个项目（使用 VC6）。它包含有 lex.yy.c, libfl.lib （拷贝自目录 flex），以及相关的项目文件。在debug 子目录中是已经生成的 词法分析器 lex.yy.exe, 利用它可以进行词法分析。
+
+（二）实验示范
+
+1、编写 lex 程序，如 example.l 文件所示
+2、调用 flex 以生成 lex.yy.c， DOS命令格式： flex < example.l
+3、新建一个目录（如 lex_yy）, 把lex.yy.c 及 libfl.lib 拷贝到该目录下。
+4、用VC6打开lex.yy.c，并生成一个新项目。
+5、编译并链接libfl.lib， 得到词法分析器 debug/ley.yy.exe。
+6、验证词法分析器的功能：
+    1）编写一输入文件（如lex_yy/debug/12.txt）
+    2) 调用 lex.yy.exe（DOS 命令格式 lex.yy.exe < 12.txt ）
+    3) 观察输出结果是否与预想的相符。
+
+（三）实验要求
+
+1、编写一个词法分析器，它针对输入文件，实现以下功能：
+
+    1）每遇到你的学号，就输出你的名字，对于其他的串原样输出。
+    2）统计输入文件中字母的数目。
+
+例如：（以肖永跃的上机题为例）：
+
+输入文件如下所示：
+
+200213001 hello world
+wo ai tian an men 
+hello world i love
+200213001
+
+输出应该如下所示：
+
+肖永钦 hello world
+wo ai tian an men
+hello world i love
+肖永钦
+# of ids = 11, # of chars = 66
+
+	
