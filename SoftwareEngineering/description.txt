@@ -1,0 +1,12 @@
+course code: 1090440010
+course name: Software Engineering
+course credit: 3
+local grade: 90.0/100.0
+URL: https://www.youtube.com/playlist?list=PLn1riPTohmCE8poyM9fO91cXKXOVA1iEx
+
+Description: 
+Through this course, students will understand and master the basic concepts and knowledge of software engineering, including the scope of software engineering, software processes, software life cycle models, software requirements, object-oriented analysis, object-oriented design, implementation and integration, maintenance, testing . Students are required to master and apply the theory and methods of object-oriented software engineering to analyze design software projects. The main contents include: mastering the basic theoretical knowledge and professional knowledge of software engineering, and applying it to solve related problems; using object-oriented software engineering analysis and design methods such as use case diagrams, class diagrams, and timing diagrams to describe the specifications of target software. Description and design; master software lifecycle elements, understand multiple software lifecycle models, and understand the basic concepts and methods of software project management, software teams, and software reuse.
+
+Test: attendence rate 10% class performance 30% test: 60%
+
+通过学习本课程，使学生了解和掌握软件工程的基本概念和知识，包括软件工程的范畴、软件过程、软件生命周期模型、软件需求、面向对象分析、面向对象设计、实现与集成、维护、测试。要求学生能够掌握和运用面向对象软件工程的理论和方法，分析设计软件项目。具体主要包括：掌握软件工程专业工程基础理论知识和专业知识，且能将其应用于解决相关问题；运用用例图、类图、时序图等面向对象软件工程分析和设计的方法描述目标软件的规格说明和设计；掌握软件生命周期要素，了解多种软件生命周期模型，了解软件项目管理、软件团队及软件复用的基本概念和方法。
