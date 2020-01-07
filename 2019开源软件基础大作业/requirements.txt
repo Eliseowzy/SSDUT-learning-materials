@@ -1,0 +1,5 @@
+lxml==4.3.4
+requests==2.22.0
+tqdm==4.32.2
+tordcloud==1.6.0
+scipy==1.4.1
