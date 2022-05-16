@@ -1,0 +1,10 @@
+{
+  "user_id_list": "user_id_list.txt",
+  "filter": 1,
+  "since_date": "2019-01-01",
+  "write_mode": [ "csv" ],
+  "original_pic_download": 0,
+  "retweet_pic_download": 0,
+  "original_video_download": 0,
+  "retweet_video_download": 0
+}
